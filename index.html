@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QQ号购买测试页</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .qq-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .info {
+      flex-grow: 1;
+    }
+    .info span {
+      display: block;
+      margin-bottom: 4px;
+    }
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #disclaimer {
+      font-size: 12px;
+      color: #888;
+      margin-top: 20px;
+      text-align: left;
+    }
+    #modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 300px;
+    }
+    select, input {
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>高质量QQ号购买中心</h2>
+
+    <div class="qq-item">
+      <div class="info">
+        <span>⭐ 【扫码直登】国卡死绑-自挂1-3级 0违规星星【精养40天+】</span>
+        <span>金额：¥40</span>
+        <span>库存：116个</span>
+      </div>
+      <button onclick="openModal('星星')">购买</button>
+    </div>
+    <div class="qq-item">
+      <div class="info">
+        <span>🌙 【扫码直登】国卡死绑-自挂4-5级 0违规月亮【精养40天+】</span>
+        <span>金额：¥55</span>
+        <span>库存：36个</span>
+      </div>
+      <button onclick="openModal('月亮')">购买</button>
+    </div>
+    <div class="qq-item">
+      <div class="info">
+        <span>☀️ 【扫码直登】【私人号】国卡无脸单太 质保登录正常 业务自测</span>
+        <span>金额：¥70</span>
+        <span>库存：13个</span>
+      </div>
+      <button onclick="openModal('太阳')">购买</button>
+    </div>
+
+    <div id="disclaimer">
+      本网站仅供学习测试使用，界面纯属娱乐，不涉及真实交易。
+    </div>
+  </div>
+
+  <div id="modal">
+    <div id="modal-content">
+      <p id="modal-title">购买</p>
+      <label>购买数量：</label>
+      <input type="number" min="1" placeholder="请输入数量">
+
+      <label>支付方式：</label>
+      <select>
+        <option>支付宝</option>
+        <option>USDT</option>
+      </select>
+
+      <button onclick="confirmPurchase()">确认购买</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhcHZdrs8fglY0d8HcRPyk7Ew3rYPlKg4",
+      authDomain: "cskl-5c90c.firebaseapp.com",
+      databaseURL: "https://cskl-5c90c-default-rtdb.firebaseio.com",
+      projectId: "cskl-5c90c",
+      storageBucket: "cskl-5c90c.firebasestorage.app",
+      messagingSenderId: "71154692530",
+      appId: "1:71154692530:web:b0d40b6d7c1e6e74d474ab",
+      measurementId: "G-QTS49XJKQD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let selectedType = '';
+
+    function openModal(type) {
+      selectedType = type;
+      document.getElementById('modal').style.display = 'flex';
+      document.getElementById('modal-title').innerText = `购买 ${type}等级账号`;
+    }
+
+    async function getUserIP() {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "未知";
+      }
+    }
+
+    async function confirmPurchase() {
+      const quantity = document.querySelector('#modal-content input').value || "未填写";
+      const method = document.querySelector('#modal-content select').value;
+      const ip = await getUserIP();
+
+      const order = {
+        type: selectedType,
+        quantity,
+        payment: method,
+        ip,
+        time: new Date().toISOString()
+      };
+
+      firebase.database().ref("orders").push(order);
+
+      alert('此功能正在维护中，请明天再尝试。');
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('modal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
