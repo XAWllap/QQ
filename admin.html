@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>后台统计 - QQ购买测试</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+    h2 {
+      text-align: center;
+    }
+    .stats {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .stats div {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    b {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="auth" style="max-width:400px;margin:100px auto;text-align:center;">
+    <h3>请输入访问密码</h3>
+    <input type="password" id="password" placeholder="密码" style="padding:8px;width:80%;margin-top:10px;">
+    <br><br>
+    <button onclick="checkPassword()" style="padding:8px 16px;">确认</button>
+    <p id="error" style="color:red;margin-top:10px;"></p>
+  </div>
+  <div id="main" style="display:none;">
+
+  <h2>后台统计 - QQ购买测试</h2>
+  <div class="stats" id="stats">
+    <div>加载中...</div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhcHZdrs8fglY0d8HcRPyk7Ew3rYPlKg4",
+      authDomain: "cskl-5c90c.firebaseapp.com",
+      databaseURL: "https://cskl-5c90c-default-rtdb.firebaseio.com",
+      projectId: "cskl-5c90c",
+      storageBucket: "cskl-5c90c.appspot.com",
+      messagingSenderId: "71154692530",
+      appId: "1:71154692530:web:b0d40b6d7c1e6e74d474ab",
+      measurementId: "G-QTS49XJKQD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref("orders").on("value", (snapshot) => {
+      const data = snapshot.val();
+      let count = 0;
+      let todayCount = 0;
+      let today = new Date().toISOString().split("T")[0];
+
+      let typeCount = { 星星: 0, 月亮: 0, 太阳: 0 };
+      let todayTypeCount = { 星星: 0, 月亮: 0, 太阳: 0 };
+
+      let payCount = { 支付宝: 0, USDT: 0 };
+      let todayPayCount = { 支付宝: 0, USDT: 0 };
+
+      for (let key in data) {
+        const item = data[key];
+        count++;
+        if (item.type && typeCount[item.type] !== undefined) typeCount[item.type]++;
+        if (item.payment && payCount[item.payment] !== undefined) payCount[item.payment]++;
+        if (item.time && item.time.startsWith(today)) {
+          todayCount++;
+          if (item.type && todayTypeCount[item.type] !== undefined) todayTypeCount[item.type]++;
+          if (item.payment && todayPayCount[item.payment] !== undefined) todayPayCount[item.payment]++;
+        }
+      }
+
+      document.getElementById("stats").innerHTML = `
+        <div>📊 <b>总点击次数：</b>${count}</div>
+        <div>📅 <b>今日点击次数：</b>${todayCount}</div>
+        <hr>
+        <div>⭐ <b>星星账号：</b>${typeCount["星星"]} 次（今日 ${todayTypeCount["星星"]}）</div>
+        <div>🌙 <b>月亮账号：</b>${typeCount["月亮"]} 次（今日 ${todayTypeCount["月亮"]}）</div>
+        <div>☀️ <b>太阳账号：</b>${typeCount["太阳"]} 次（今日 ${todayTypeCount["太阳"]}）</div>
+        <hr>
+        <div>💰 <b>支付方式统计：</b></div>
+        <div>—— 支付宝：${payCount["支付宝"]} 次（今日 ${todayPayCount["支付宝"]}）</div>
+        <div>—— USDT：${payCount["USDT"]} 次（今日 ${todayPayCount["USDT"]}）</div>
+      `;
+    });
+  </script>
+
+  </div>
+  <script>
+    function checkPassword() {
+      const input = document.getElementById('password').value;
+      if (input === 'testadmin123') {
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+      } else {
+        document.getElementById('error').innerText = '密码错误';
+      }
+    }
+  </script>
+</body>
+
+</html>
